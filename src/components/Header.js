@@ -36,7 +36,7 @@ const Header = (props) => {
                 variant="contained"
                 color="secondary"
                 onClick={() => {
-                  dispatch(userActions.logoutFB());
+                  dispatch(userActions.logout());
                 }}
               >
                 로그아웃

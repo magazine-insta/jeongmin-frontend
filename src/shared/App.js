@@ -1,5 +1,5 @@
 import './App.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -18,9 +18,10 @@ import { getCookie } from './Cookie';
 function App() {
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    if (getCookie("token")) {
-      dispatch(userActions.loginCheck());
+  useEffect(() => {
+    const token = getCookie("token")
+    if (token) {
+      dispatch(userActions.loginCheck(token));
     }
   }, []);
 

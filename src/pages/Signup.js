@@ -29,7 +29,7 @@ const Signup = (props) => {
       return;
     }
 
-    dispatch(userActions.signupAxios(userEmail, password, nickname, pwd_check));
+    dispatch(userActions.signupAxios(userEmail, password, nickname));
   };
 
   return (
