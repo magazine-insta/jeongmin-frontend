@@ -97,9 +97,6 @@ const addPostFB = (contents = "", layout = "") => {
       snapshot.ref
         .getDownloadURL()
         .then((url) => {
-          return url;
-        })
-        .then((url) => {
           const postData = { ..._post, imageUrl: url };
           instance
             .post(
