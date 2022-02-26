@@ -9,12 +9,6 @@ const Upload = (props) => {
     const fileInput = React.useRef();
 
     const selectFile = (e) => {
-        console.log(e);
-        console.log(e.target);
-        console.log(e.target.files[0]);
-
-        console.log(fileInput.current.files[0]);
-
         const reader = new FileReader();
         const file = fileInput.current.files[0];
 

@@ -13,6 +13,7 @@ import { getCookie } from "../../shared/Cookie";
 
 // 액션 정의
 const GET_POST = "GET_POST";
+const GET_ONE_POST = "GET_ONE_POST";
 const ADD_POST = "ADD_POST";
 const UPDATE_POST = "UPDATE_POST";
 const DELETE_POST = "DELETE_POST";
@@ -23,6 +24,7 @@ const getPost = createAction(GET_POST, (post_list, paging) => ({
   post_list,
   paging,
 }));
+const getOnePost = createAction(GET_ONE_POST, (post) => ({ post }));
 const addPost = createAction(ADD_POST, (post) => ({ post }));
 const updatePost = createAction(UPDATE_POST, (postId, post) => ({
   postId,
@@ -67,6 +69,19 @@ const getPostAxios = (start = null, size = 3) => {
   };
 };
 
+const getOnePostFB = (postId) => {
+  return function (dispatch, getState, { history }) {
+    instance
+      .get(`api/post/${postId}`)
+      .then((res) => {
+        dispatch(getOnePost(res.data))
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+};
+
 const addPostFB = (contents = "", layout = "") => {
   console.log("addpost::: ", contents, layout);
   return function (dispatch, getState, { history }) {
@@ -96,6 +111,9 @@ const addPostFB = (contents = "", layout = "") => {
     _upload.then((snapshot) => {
       snapshot.ref
         .getDownloadURL()
+        .then((url) => {
+          return url;
+        })
         .then((url) => {
           const postData = { ..._post, imageUrl: url };
           instance
@@ -198,37 +216,16 @@ const updatePostFB = (postId = null, post = {}) => {
   };
 };
 
-const getOnePostFB = (id) => {
-  //   return function (dispatch, getState, { history }) {
-  //     const postDB = firestore.collection('post');
-  //     postDB
-  //       .doc(id)
-  //       .get()
-  //       .then((doc) => {
-  //         let _post = doc.data();
-  //         let post = Object.keys(_post).reduce(
-  //           (acc, cur) => {
-  //             if (cur.indexOf('user_') !== -1) {
-  //               return {
-  //                 ...acc,
-  //                 user_info: { ...acc.user_info, [cur]: _post[cur] },
-  //               };
-  //             }
-  //             return { ...acc, [cur]: _post[cur] };
-  //           },
-  //           { id: doc.id, user_info: {} },
-  //         );
-  //         dispatch(getPost([post]));
-  //       });
-  //   };
-};
-
 export default handleActions(
   {
     [GET_POST]: (state, action) =>
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
         draft.is_loading = false;
+      }),
+    [GET_ONE_POST]: (state, action) =>
+      produce(state, (draft) => {
+        draft.list.push(action.payload.post);
       }),
 
     [ADD_POST]: (state, action) =>
@@ -253,6 +250,7 @@ export default handleActions(
 
 const actionCreators = {
   getPost,
+  getOnePost,
   addPost,
   updatePost,
   deletePost,

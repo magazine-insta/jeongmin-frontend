@@ -26,7 +26,7 @@ const PostList = (props) => {
         <InfinityScroll>
           {post_list.map((p) => {
             return (
-              <Grid bg="#ffffff" margin="8px 0px" key={p.board_id}>
+              <Grid bg="#ffffff" margin="8px 0px" key={p.postId}>
                 <Post {...p} />
               </Grid>
             );

@@ -1,29 +1,27 @@
-import React from 'react';
-import Post from '../components/Post';
-import { useDispatch, useSelector } from 'react-redux';
-import { Grid } from '../elements';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import { history } from '../redux/configureStore';
-import { actionCreators as postActions } from '../redux/modules/post';
+import React from "react";
+import Post from "../components/Post";
+import { useDispatch, useSelector } from "react-redux";
+import { Grid } from "../elements";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import { history } from "../redux/configureStore";
+import { actionCreators as postActions } from "../redux/modules/post";
 
 const PostDetail = (props) => {
-  console.log(props);
   const dispatch = useDispatch();
-  const id = props.match.params.id;
+  const post_list = useSelector((state) => state.post.list);
+  console.log(post_list);
 
-  const user_info = useSelector((state) => state.user.user);
-  console.log(user_info)
-  const post_list = useSelector((store) => store.post.list);
-  const post_idx = post_list.findIndex((p) => p.id === id);
-  const post = post_list[post_idx];
+  const id = props.match.params.id;
+  console.log(id);
+  const post = post_list.find((p) => {return p});
+  console.log(post)
 
   React.useEffect(() => {
     if (post) {
       return;
     }
-
     dispatch(postActions.getOnePostFB(id));
   }, []);
 
@@ -31,14 +29,14 @@ const PostDetail = (props) => {
     <React.Fragment>
       {post && (
         <>
-          <Post {...post} is_me={post.user_info.user_id === user_info?.uid} />
-          {post.user_info.user_id === user_info?.uid ? (
+          <Post {...post} is_me={true} />
+          {true ? (
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                '& > *': {
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                "& > *": {
                   m: 1,
                 },
               }}
@@ -49,7 +47,7 @@ const PostDetail = (props) => {
               >
                 <Button
                   onClick={() => {
-                    history.push('/');
+                    history.push("/");
                   }}
                 >
                   메인으로
@@ -75,7 +73,7 @@ const PostDetail = (props) => {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  history.push('/');
+                  history.push("/");
                 }}
               >
                 메인으로

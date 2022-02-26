@@ -18,7 +18,7 @@ const Post = (props) => {
   const layout = props.layoutType;
 
   const today = moment().format();
-  const createdAt = moment(props.time[3]).hours();
+  const createdAt = moment(props.createdAt).hours();
   const timeDiff = Math.abs(moment(today).hour() - createdAt);
 
   return (
@@ -35,7 +35,7 @@ const Post = (props) => {
         </Grid>
         <Grid
           _onClick={() => {
-            history.push(`/post/${props.board_id}`);
+            history.push(`/post/${props.postId}`);
           }}
         >
           {layout === "DEFAULT" && (
@@ -44,7 +44,7 @@ const Post = (props) => {
                 <Text>{props.contents}</Text>
               </Grid>
               <Grid>
-                <Image shape="rectangle" src={props.img_url} />
+                <Image shape="rectangle" src={props.imgUrl} />
               </Grid>
             </>
           )}
@@ -54,14 +54,14 @@ const Post = (props) => {
                 <Text>{props.contents}</Text>
               </Grid>
               <Grid>
-                <Image shape="rectangle" src={props.img_url} />
+                <Image shape="rectangle" src={props.imageUrl} />
               </Grid>
             </Grid>
           )}
           {layout === "LEFT" && (
             <Grid is_flex>
               <Grid>
-                <Image shape="rectangle" src={props.img_url} />
+                <Image shape="rectangle" src={props.imageUrl} />
               </Grid>
               <Grid padding="16px">
                 <Text>{props.contents}</Text>
@@ -70,7 +70,7 @@ const Post = (props) => {
           )}
         </Grid>
         <Grid is_flex padding="5px 16px">
-          <Like post_id={props.board_id}></Like>
+          <Like post_id={props.postId}></Like>
         </Grid>
       </PostBox>
     </React.Fragment>

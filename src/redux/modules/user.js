@@ -2,9 +2,8 @@
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
 // 쿠키생성
-import { setCookie, deleteCookie, getCookie } from "../../shared/Cookie";
+import { setCookie, deleteCookie } from "../../shared/Cookie";
 // API 연결
-import axios from "axios";
 import { instance } from "../../services/axios";
 
 // 액션 선언
@@ -85,7 +84,7 @@ const loginCheck = (token) => {
         .then((data) => {
           const user_info = {
             userId: data.userId,
-            userEmail: data.userEmail,
+            userEmail: data.username,
             nickname: data.nickname,
           };
           dispatch(checkUser(user_info));
