@@ -6,8 +6,6 @@ import { storage } from "../../shared/firebase";
 import { actionCreators as imageActions } from "./image";
 // API연결
 import { instance, token } from "../../services/axios";
-// JWT 토큰
-import { getCookie } from "../../shared/Cookie";
 
 // 액션 정의
 const GET_POST = "GET_POST";
@@ -156,36 +154,55 @@ const updatePostFB = (postId = null, post = {}) => {
     }
 
     const _image = getState().image.preview;
-
-    const _postIdx = getState().post.list.findIndex((p) => p.id === postId);
-    const _post = getState().post.list[_postIdx];
+    // const _postIdx = getState().post.list.findIndex((p) => p.id === postId);
+    const _post = getState().post.list[0];
+    console.log(_post);
+    const updatePostData = {
+      ...post,
+      imageUrl: _post.imageUrl,
+    };
+    console.log(updatePostData);
 
     if (_image === _post.imageUrl) {
       instance
-        .put(`api/post/${postId}`)
-        .then(() => {
-          dispatch(updatePost(postId, { ...post }));
+        .put(`api/post/${postId}`, updatePostData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
         })
-        .catch((err) => console.log("updatePost: ", err.code, err.message));
+        .then((res) => {
+          dispatch(updatePost(postId, updatePostData));
+          history.replace('/')
+        })
+        .catch((err) => console.log("updatePost: ", err.response));
       return;
     } else {
       const _upload = storage
         .ref(`images/${postId}_${new Date().getTime()}`)
         .putString(_image, "data_url");
-      console.log(_upload);
       _upload.then((snapshot) => {
         snapshot.ref
           .getDownloadURL()
           .then((url) => {
             console.log(url);
-
             return url;
           })
           .then((url) => {
             instance
-              .put(`api/post/${postId}`)
+              .put(
+                `api/post/${postId}`,
+                { ...post, imageUrl: url },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                  withCredentials: true,
+                }
+              )
               .then(() => {
                 dispatch(updatePost(postId, { ...post, imageUrl: url }));
+                history.replace('/')
               })
               .catch((err) => console.log(" ", err.code, err.message));
           })
