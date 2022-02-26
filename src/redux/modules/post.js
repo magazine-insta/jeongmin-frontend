@@ -4,8 +4,6 @@ import { produce } from "immer";
 // 이미지 저장
 import { storage } from "../../shared/firebase";
 import { actionCreators as imageActions } from "./image";
-// 시간포맷
-import moment from "moment";
 // API연결
 import { instance } from "../../services/axios";
 // JWT 토큰
@@ -33,6 +31,9 @@ const updatePost = createAction(UPDATE_POST, (postId, post) => ({
 const deletePost = createAction(DELETE_POST, (postId) => ({ postId }));
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
+const token = getCookie("token");
+console.log("포스트 모듈:::::", token);
+
 // 초기화 정보
 const initialState = {
   list: [],
@@ -41,15 +42,9 @@ const initialState = {
 };
 
 const initialPost = {
-  postId: 0,
-  nickname: "amin",
-  createdAt: moment().format(),
   contents: "testContents_admin",
   imageUrl: "testUrl_admin",
-  likeCnt: 0,
-  userLiked: false,
   layoutType: "RIGHT",
-  isMe: false,
 };
 
 // 미들웨어
@@ -61,7 +56,15 @@ const getPostAxios = (start = null, size = 3) => {
     }
     dispatch(loading(true));
     instance
-      .get("api/post")
+      .get(
+        "api/post",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
         dispatch(getPost(res.data, false));
       })
@@ -69,12 +72,36 @@ const getPostAxios = (start = null, size = 3) => {
   };
 };
 
-const getOnePostFB = (postId) => {
+const getOnePostAxios = (postId) => {
   return function (dispatch, getState, { history }) {
+    // instance
+    //   .get(
+    //     `api/post/${postId}`,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     },
+    //     { withCredentials: true }
+    //   )
+    //   .then((res) => {
+    //     dispatch(getPost(res.data, false));
+    //   })
+    //   .catch((err) => console.log("getPostAxios::: ", err.message));
+  
     instance
-      .get(`api/post/${postId}`)
+      .get(
+        `api/post/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
-        dispatch(getOnePost(res.data))
+        dispatch(getOnePost(res.data));
+        history.replace(`/post/${postId}`);
       })
       .catch((err) => {
         console.log(err);
@@ -82,11 +109,10 @@ const getOnePostFB = (postId) => {
   };
 };
 
-const addPostFB = (contents = "", layout = "") => {
-  console.log("addpost::: ", contents, layout);
+const addPostAxios = (contents = "", layout = "") => {
   return function (dispatch, getState, { history }) {
-    const token = getCookie("token");
     const _user = getState().user.user;
+    console.log("게시글 작성 시::::: ", _user, token);
 
     const user_info = {
       nickname: _user.nickname,
@@ -95,14 +121,10 @@ const addPostFB = (contents = "", layout = "") => {
     const _post = {
       ...initialPost,
       contents: contents,
-      createdAt: moment().format(),
       layoutType: layout,
     };
 
     const _image = getState().image.preview;
-
-    console.log(_image);
-    console.log(typeof _image);
 
     const _upload = storage
       .ref(`images/${user_info.nickname}_${new Date().getTime()}`)
@@ -112,36 +134,33 @@ const addPostFB = (contents = "", layout = "") => {
       snapshot.ref
         .getDownloadURL()
         .then((url) => {
+          dispatch(imageActions.uploadImage(url));
           return url;
         })
         .then((url) => {
           const postData = { ..._post, imageUrl: url };
+          console.log("통신 전::::: ", postData);
+          console.log("통신 전::::: ", token);
           instance
             .post(
               "api/post",
+              postData,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
               },
-              postData
+              { withCredentials: true }
             )
             .then((doc) => {
-              console.log(doc);
+              dispatch(addPost(doc.data));
+              dispatch(imageActions.setPreview(null));
+              history.replace("/");
+            })
+            .catch((err) => {
+              window.alert("앗! 포스트 작성에 문제가 있어요!");
+              console.log("post 작성에 실패했어요!", err.response);
             });
-          // instance
-          //   .post()
-          //   .then((doc) => {
-          //     let post = { user_info, ..._post, id: doc.id, imageUrl: url };
-          //     dispatch(addPost(post));
-          //     history.replace("/");
-
-          //     dispatch(imageActions.setPreview(null));
-          //   })
-          //   .catch((err) => {
-          //     window.alert("앗! 포스트 작성에 문제가 있어요!");
-          //     console.log("post 작성에 실패했어요!", err);
-          //   });
         })
         .catch((err) => {
           window.alert("앗! 이미지 업로드에 문제가 있어요!");
@@ -151,28 +170,12 @@ const addPostFB = (contents = "", layout = "") => {
   };
 };
 
-const deletePostFB = (postId = null) => {
-  return function (dispatch, getState, { history }) {
-    // if (!postId) {
-    //   console.log('게시물 정보가 없어요!');
-    //   return;
-    // }
-
-    instance
-      .delete(`api/post/${postId}/like`)
-      .then(() => {
-        dispatch(deletePost(postId));
-      })
-      .catch((err) => console.log("deletePost::: ", err.message));
-  };
-};
-
 const updatePostFB = (postId = null, post = {}) => {
   return function (dispatch, getState, { history }) {
-    // if (!postId) {
-    //   console.log('게시물 정보가 없어요!');
-    //   return;
-    // }
+    if (!postId) {
+      console.log("게시물 정보가 없어요!");
+      return;
+    }
 
     const _image = getState().image.preview;
 
@@ -191,7 +194,7 @@ const updatePostFB = (postId = null, post = {}) => {
       const _upload = storage
         .ref(`images/${postId}_${new Date().getTime()}`)
         .putString(_image, "data_url");
-
+      console.log(_upload);
       _upload.then((snapshot) => {
         snapshot.ref
           .getDownloadURL()
@@ -213,6 +216,31 @@ const updatePostFB = (postId = null, post = {}) => {
           });
       });
     }
+  };
+};
+
+const deletePostAxios = (postId = null) => {
+  return function (dispatch, getState, { history }) {
+    if (!postId) {
+      console.log("게시물 정보가 없어요!");
+      return;
+    }
+
+    instance
+      .delete(
+        `api/post/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+        { withCredentials: true }
+      )
+      .then(() => {
+        dispatch(deletePost(postId));
+        window.location.replace("/");
+      })
+      .catch((err) => console.log("deletePost::: ", err.message));
   };
 };
 
@@ -255,10 +283,10 @@ const actionCreators = {
   updatePost,
   deletePost,
   getPostAxios,
-  addPostFB,
+  getOnePostAxios,
+  addPostAxios,
   updatePostFB,
-  getOnePostFB,
-  deletePostFB,
+  deletePostAxios,
 };
 
 export { actionCreators };

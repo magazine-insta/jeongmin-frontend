@@ -1,38 +1,44 @@
 import React from "react";
-import Post from "../components/Post";
-import { useDispatch, useSelector } from "react-redux";
+
 import { Grid } from "../elements";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import { history } from "../redux/configureStore";
+
+import { useDispatch, useSelector } from "react-redux";
 import { actionCreators as postActions } from "../redux/modules/post";
+
+import { history } from "../redux/configureStore";
+
+import Post from "../components/Post";
 
 const PostDetail = (props) => {
   const dispatch = useDispatch();
   const post_list = useSelector((state) => state.post.list);
-  console.log(post_list);
+  const user_info = useSelector((state) => state.user.user);
+  console.log(user_info);
 
   const id = props.match.params.id;
   console.log(id);
-  const post = post_list.find((p) => {return p});
-  console.log(post)
+  const post = post_list[0];
+  console.log(post);
 
   React.useEffect(() => {
     if (post) {
       return;
     }
-    dispatch(postActions.getOnePostFB(id));
+    dispatch(postActions.getOnePostAxios(id));
   }, []);
 
   return (
     <React.Fragment>
       {post && (
         <>
-          <Post {...post} is_me={true} />
-          {true ? (
+          <Post {...post} is_me={post.nickname === user_info?.nickname} />
+          {post.nickname === user_info?.nickname ? (
             <Box
               sx={{
+                padding: "16px 0px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -69,7 +75,7 @@ const PostDetail = (props) => {
               </ButtonGroup>
             </Box>
           ) : (
-            <Grid center>
+            <Grid center padding="16px 0px">
               <Button
                 variant="outlined"
                 onClick={() => {

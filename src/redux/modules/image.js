@@ -3,28 +3,29 @@ import { produce } from "immer";
 
 import { storage } from "../../shared/firebase";
 
-// 액션 정의
+//actions
 const UPLOADING = "UPLOADING";
 const UPLOAD_IMAGE = "UPLOAD_IMAGE";
 const SET_PREVIEW = "SET_PREVIEW";
 
-// 액션 생성 함수 정의
+//action creator
 const uploading = createAction(UPLOADING, (uploading) => ({ uploading }));
-const uploadImage = createAction(UPLOAD_IMAGE, (imageUrl) => ({ imageUrl }));
+const uploadImage = createAction(UPLOAD_IMAGE, (image_url) => ({ image_url }));
 const setPreview = createAction(SET_PREVIEW, (preview) => ({ preview }));
 
-// 업로드 이미지 (파이어 스토어)
 function uploadImageFB(image) {
   return function (dispatch, getState, { history }) {
     dispatch(uploading(true));
 
+    console.log(`images/${new Date().getTime()}_${image.name}`);
     const _upload = storage.ref(`images/${image.name}`).put(image);
 
-    // 업로드
+    //   업로드!
     _upload
       .then((snapshot) => {
         console.log(snapshot);
-        // 업로드한 파일의 url 가져오는 부분
+
+        // 업로드한 파일의 다운로드 경로를 가져오자!
         snapshot.ref.getDownloadURL().then((url) => {
           console.log(url);
           dispatch(uploadImage(url));
@@ -32,14 +33,13 @@ function uploadImageFB(image) {
       })
       .catch((err) => {
         dispatch(uploading(false));
-        console.log("업로드 이미지", err)
       });
   };
 }
 
 // initial state
 const initialState = {
-  imageUrl: "",
+  image_url: "",
   uploading: false,
   preview: null,
 };
@@ -49,7 +49,7 @@ export default handleActions(
   {
     [UPLOAD_IMAGE]: (state, action) =>
       produce(state, (draft) => {
-        draft.imageUrl = action.payload.imageUrl;
+        draft.image_url = action.payload.image_url;
         draft.uploading = false;
       }),
 

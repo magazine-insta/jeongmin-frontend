@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Spinner } from '../elements';
+import React, { useCallback, useEffect, useState } from "react";
+import { Spinner } from "../elements";
 // import { instance } from '../services/axios';
 
 const InfinityScroll = (props) => {
@@ -45,7 +45,7 @@ const InfinityScroll = (props) => {
   //       return Promise.reject(err);
   //     });
   // };
- 
+
   // useEffect(() => {
   //   getFetchData();
   // });

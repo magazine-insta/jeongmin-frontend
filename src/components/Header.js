@@ -7,12 +7,12 @@ import { history } from "../redux/configureStore";
 import { Grid, Text } from "../elements";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-
 import { getCookie } from "../shared/Cookie";
 
 const Header = (props) => {
   const dispatch = useDispatch();
   const jwtToken = getCookie("token") ? true : false;
+  console.log(jwtToken)
 
   return (
     <React.Fragment>

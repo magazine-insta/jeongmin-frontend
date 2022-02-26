@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import { Grid, Image, Text } from "../elements";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import moment from "moment";
+
+import Moment from "react-moment";
+import 'moment/locale/ko';
+
 import Like from "./Like";
 import { history } from "../redux/configureStore";
+
 import { useDispatch } from "react-redux";
 import { actionCreators as likeActions } from "../redux/modules/like";
-import styled from "styled-components";
 
 const Post = (props) => {
   // const dispatch = useDispatch();
@@ -17,9 +21,19 @@ const Post = (props) => {
 
   const layout = props.layoutType;
 
-  const today = moment().format();
-  const createdAt = moment(props.createdAt).hours();
-  const timeDiff = Math.abs(moment(today).hour() - createdAt);
+  const displayCreatedAt = (createdAt) => {
+    let startTime = new Date(createdAt);
+    let nowTime = Date.now();
+    if (parseInt(startTime - nowTime) > -60000) {
+      return <Moment format="방금 전">{startTime}</Moment>;
+    }
+    if (parseInt(startTime - nowTime) < -86400000) {
+      return <Moment format="MMM D일">{startTime}</Moment>;
+    }
+    if (parseInt(startTime - nowTime) > -86400000) {
+      return <Moment fromNow >{startTime}</Moment>;
+    }
+  };
 
   return (
     <React.Fragment>
@@ -30,7 +44,7 @@ const Post = (props) => {
             <Text bold>{props.nickname}</Text>
           </Grid>
           <Grid width="auto">
-            <Text>{timeDiff}시간 전</Text>
+            <Text>{displayCreatedAt(props.createdAt)}</Text>
           </Grid>
         </Grid>
         <Grid

@@ -2,6 +2,7 @@ import React from "react";
 
 import { useSelector } from "react-redux";
 import { getCookie } from "./Cookie";
+// import { getCookie } from "./Cookie";
 
 const Permit = (props) => {
 
