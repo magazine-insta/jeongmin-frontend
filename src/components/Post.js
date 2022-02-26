@@ -1,25 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+
 import styled from "styled-components";
 import { Grid, Image, Text } from "../elements";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import Moment from "react-moment";
-import 'moment/locale/ko';
+import "moment/locale/ko";
 
 import Like from "./Like";
 import { history } from "../redux/configureStore";
 
-import { useDispatch } from "react-redux";
-import { actionCreators as likeActions } from "../redux/modules/like";
-
 const Post = (props) => {
-  // const dispatch = useDispatch();
-  // increase, decrease dispatch reducer
-  // useEffect(() => {
-  //   dispatch(likeActions.getLikeFB(props.id));
-  // }, []);
+  const dispatch = useDispatch();
 
   const layout = props.layoutType;
+
+  const likes = {
+    postId: props.postId,
+    likeCnt: props.likeCnt,
+    userLiked: props.userLiked,
+    isMe: props.isMe,
+  };
 
   const displayCreatedAt = (createdAt) => {
     let startTime = new Date(createdAt);
@@ -31,7 +33,7 @@ const Post = (props) => {
       return <Moment format="MMM D일">{startTime}</Moment>;
     }
     if (parseInt(startTime - nowTime) > -86400000) {
-      return <Moment fromNow >{startTime}</Moment>;
+      return <Moment fromNow>{startTime}</Moment>;
     }
   };
 
@@ -49,7 +51,8 @@ const Post = (props) => {
         </Grid>
         <Grid
           _onClick={() => {
-            history.push(`/post/${props.postId}`);
+            console.log(props.postId);
+            history.replace(`/post/${props.postId}`);
           }}
         >
           {layout === "DEFAULT" && (
@@ -84,7 +87,7 @@ const Post = (props) => {
           )}
         </Grid>
         <Grid is_flex padding="5px 16px">
-          <Like post_id={props.postId}></Like>
+          <Like {...likes}></Like>
         </Grid>
       </PostBox>
     </React.Fragment>
@@ -92,27 +95,16 @@ const Post = (props) => {
 };
 
 Post.defaultProps = {
-  account_id: 0,
-  account_name: "test",
-  board_id: 0,
-  board_status: "DEFAULT",
-  content: "귀여운 고양이1",
-  img_url: "https://t1.daumcdn.net/cfile/tistory/216C553953FC27C335",
-  like: 0,
-  time: [],
+  postId: 0,
+  nickname: "nickname",
+  createdAt: "",
+  contents: "doremi",
+  imageUrl: "doremi",
+  likeCnt: 0,
+  userLiked: false,
+  layoutType: "DEFAULT",
+  isMe: false,
 };
-
-// Post.defaultProps = {
-//   postId: 0,
-//   nickname: 'nickname',
-//   createdAt: '',
-//   contents: 'doremi',
-//   imageUrl: 'doremi',
-//   likeCnt: 0,
-//   userLiked: false,
-//   layoutType: 'LEFT',
-//   is_me: false,
-// };
 
 const PostBox = styled.div`
   border: 1px solid #e7c1ff;

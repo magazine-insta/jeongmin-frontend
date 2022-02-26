@@ -11,6 +11,7 @@ import { getCookie } from "../shared/Cookie";
 
 const Header = (props) => {
   const dispatch = useDispatch();
+  const is_login = useSelector((state) => state.user.is_login)
   const jwtToken = getCookie("token") ? true : false;
   console.log(jwtToken)
 
@@ -26,7 +27,7 @@ const Header = (props) => {
             Reactrgram
           </Text>
         </Grid>
-        {jwtToken ? (
+        {is_login ? (
           <Grid>
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               <Button variant="contained" disabled>

@@ -1,42 +1,49 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Text, Grid } from "../elements";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { actionCreators as likeActions } from "../redux/modules/like";
 
-class Like extends Component {
-  state = {
-    isLike: false,
-    notice: "0",
+const Like = (props) => {
+  const dispatch = useDispatch();
+  // const likes = {
+  //   postId: props.postId,
+  //   likeCnt: props.likeCnt,
+  //   userLiked: props.userLiked,
+  //   isMe: props.isMe,
+  // };
+  const [likeCnt, setLikeCnt] = useState(props.likeCnt);
+  const [userLiked, setUserLiked] = useState(props.userLiked);
+
+  const cancelLike = () => {
+    // 빨강 -> 회색
+    dispatch(likeActions.cancelLikeAxios(props.postId));
+    setUserLiked(false);
+    setLikeCnt(likeCnt - 1);
   };
 
-  updateHeart = () => {
-    this.state.isLike
-      ? this.setState({
-          isLike: false,
-          notice: "0",
-        })
-      : this.setState({
-          isLike: true,
-          notice: "1",
-        });
+  const addLike = () => {
+    // 회색 -> 빨강
+    dispatch(likeActions.addLikeAxios(props.postId));
+    setUserLiked(true);
+    setLikeCnt(likeCnt + 1);
   };
 
-  render() {
-    return (
-      <>
-        <Grid is_flex padding="5px" width="150px">
-          <Text>좋아요 {this.state.notice}개</Text>
-        </Grid>
-        <div>
-          {this.state.isLike ? (
-            <FavoriteIcon style={{ color: "red" }} onClick={this.updateHeart} />
-          ) : (
-            <FavoriteBorderIcon onClick={this.updateHeart} />
-          )}
-        </div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Grid is_flex padding="5px" width="150px">
+        <Text>좋아요 {likeCnt}개</Text>
+      </Grid>
+      <div>
+        {userLiked ? (
+          <FavoriteIcon style={{ color: "red" }} onClick={cancelLike} />
+        ) : (
+          <FavoriteBorderIcon onClick={addLike} />
+        )}
+      </div>
+    </>
+  );
+};
 
 export default Like;

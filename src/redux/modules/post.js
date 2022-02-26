@@ -5,7 +5,7 @@ import { produce } from "immer";
 import { storage } from "../../shared/firebase";
 import { actionCreators as imageActions } from "./image";
 // API연결
-import { instance } from "../../services/axios";
+import { instance, token } from "../../services/axios";
 // JWT 토큰
 import { getCookie } from "../../shared/Cookie";
 
@@ -30,9 +30,6 @@ const updatePost = createAction(UPDATE_POST, (postId, post) => ({
 }));
 const deletePost = createAction(DELETE_POST, (postId) => ({ postId }));
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
-
-const token = getCookie("token");
-console.log("포스트 모듈:::::", token);
 
 // 초기화 정보
 const initialState = {
@@ -74,21 +71,6 @@ const getPostAxios = (start = null, size = 3) => {
 
 const getOnePostAxios = (postId) => {
   return function (dispatch, getState, { history }) {
-    // instance
-    //   .get(
-    //     `api/post/${postId}`,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     },
-    //     { withCredentials: true }
-    //   )
-    //   .then((res) => {
-    //     dispatch(getPost(res.data, false));
-    //   })
-    //   .catch((err) => console.log("getPostAxios::: ", err.message));
-  
     instance
       .get(
         `api/post/${postId}`,
@@ -112,8 +94,6 @@ const getOnePostAxios = (postId) => {
 const addPostAxios = (contents = "", layout = "") => {
   return function (dispatch, getState, { history }) {
     const _user = getState().user.user;
-    console.log("게시글 작성 시::::: ", _user, token);
-
     const user_info = {
       nickname: _user.nickname,
     };
@@ -139,8 +119,6 @@ const addPostAxios = (contents = "", layout = "") => {
         })
         .then((url) => {
           const postData = { ..._post, imageUrl: url };
-          console.log("통신 전::::: ", postData);
-          console.log("통신 전::::: ", token);
           instance
             .post(
               "api/post",

@@ -61,7 +61,6 @@ const loginAxios = (username, password) => {
           userEmail: data.userEmail,
           nickname: data.nickname,
         };
-        console.log("로그인 시::::: ", data.token);
         setCookie("token", data.token);
         dispatch(setUser(user_info));
         history.replace("/");

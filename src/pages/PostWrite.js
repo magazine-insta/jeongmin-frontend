@@ -10,16 +10,14 @@ const PostWrite = (props) => {
   const dispatch = useDispatch();
   const is_login = useSelector((state) => state.user.is_login);
   const preview = useSelector((state) => state.image.preview);
-  console.log(preview);
   const post_list = useSelector((state) => state.post.list);
-  const post_id = props.match.params.id;
-  console.log(post_id);
-  const is_edit = post_id ? true : false;
-  console.log(is_edit);
+  const id = props.match.params.id;
+  const is_edit = id ? true : false;
   const { history } = props;
 
-  let _post = is_edit ? post_list.find((p) => p.id === post_id) : null;
+  let _post = is_edit ? post_list.find((p) => p.postId === parseInt(id)) : null;
 
+  console.log(_post);
   const [contents, setContents] = React.useState(_post ? _post.contents : "");
   const [layout, setLayout] = React.useState("DEFAULT");
   const layout_list = ["DEFAULT", "RIGHT", "LEFT"];
@@ -37,7 +35,7 @@ const PostWrite = (props) => {
   useEffect(() => {
     if (is_edit && !_post) {
       console.log("포스트 정보가 없어요!");
-      // history.goBack();
+      history.goBack();
       return;
     }
 
@@ -51,7 +49,7 @@ const PostWrite = (props) => {
   };
 
   const editPost = () => {
-    dispatch(postActions.editPostFB(post_id, { contents: contents, layout }));
+    dispatch(postActions.editPostFB(id, { contents: contents, layout }));
   };
 
   if (!is_login) {
