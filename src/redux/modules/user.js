@@ -73,15 +73,12 @@ const loginCheck = (token) => {
   return function (dispatch, getState, { history }) {
     if (token) {
       instance
-        .get(
-          "api/user",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        .get("api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          { withCredentials: true }
-        )
+          withCredentials: true,
+        })
         .then((res) => {
           return res.data;
         })
