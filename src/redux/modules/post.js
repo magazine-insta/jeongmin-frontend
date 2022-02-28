@@ -32,7 +32,7 @@ const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 // 초기화 정보
 const initialState = {
   list: [],
-  paging: { next:true, page: 0, size: 3 },
+  paging: { next: true, page: 0, size: 3 },
   is_loading: false,
 };
 
@@ -58,7 +58,6 @@ const getPostAxios = (page = 1, size = 3) => {
         withCredentials: true,
       })
       .then((res) => {
-        
         dispatch(getPost(res.data, false));
       })
       .catch((err) => console.log("getPostAxios::: ", err.message));
@@ -75,8 +74,8 @@ const getOnePostAxios = (postId) => {
         withCredentials: true,
       })
       .then((res) => {
-        dispatch(getOnePost(res.data));
         history.replace(`/post/${postId}`);
+        dispatch(getOnePost(res.data));
       })
       .catch((err) => {
         console.log(err);
@@ -120,9 +119,9 @@ const addPostAxios = (contents = "", layout = "") => {
               withCredentials: true,
             })
             .then((doc) => {
+              history.replace("/");
               dispatch(addPost(doc.data));
               dispatch(imageActions.setPreview(null));
-              history.replace("/");
             })
             .catch((err) => {
               window.alert("앗! 포스트 작성에 문제가 있어요!");
@@ -163,8 +162,8 @@ const updatePostFB = (postId = null, post = {}) => {
           withCredentials: true,
         })
         .then((res) => {
-          dispatch(updatePost(postId, updatePostData));
           history.replace("/");
+          dispatch(updatePost(postId, updatePostData));
         })
         .catch((err) => console.log("updatePost: ", err.response));
       return;
@@ -232,9 +231,9 @@ export default handleActions(
     [GET_POST]: (state, action) =>
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
-        draft.paging.page += 1
-        if(action.payload.post_list < 3){
-          draft.paging.next = false
+        draft.paging.page += 1;
+        if (action.payload.post_list < 3) {
+          draft.paging.next = false;
         }
         draft.is_loading = false;
       }),

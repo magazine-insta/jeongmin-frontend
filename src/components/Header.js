@@ -7,14 +7,14 @@ import { history } from "../redux/configureStore";
 import { Grid, Text } from "../elements";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import { getCookie } from "../shared/Cookie";
+
+import { token } from "../services/axios"
 
 const Header = (props) => {
   const dispatch = useDispatch();
   const is_login = useSelector((state) => state.user.is_login)
-  const jwtToken = getCookie("token") ? true : false;
-  console.log(jwtToken)
-
+  console.log(token)
+  
   return (
     <React.Fragment>
       <Grid is_flex padding="16px">
