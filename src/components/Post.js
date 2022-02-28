@@ -23,6 +23,8 @@ const Post = (props) => {
     isMe: props.isMe,
   };
 
+  console.log(props)
+
   const displayCreatedAt = (createdAt) => {
     let startTime = new Date(createdAt);
     let nowTime = Date.now();
@@ -61,7 +63,7 @@ const Post = (props) => {
                 <Text>{props.contents}</Text>
               </Grid>
               <Grid>
-                <Image shape="rectangle" src={props.imgUrl} />
+                <Image shape="rectangle" src={props.imageUrl} />
               </Grid>
             </>
           )}

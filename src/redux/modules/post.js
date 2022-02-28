@@ -32,7 +32,7 @@ const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 // 초기화 정보
 const initialState = {
   list: [],
-  paging: { start: null, next: null, size: 3 },
+  paging: { next:true, page: 0, size: 3 },
   is_loading: false,
 };
 
@@ -43,7 +43,7 @@ const initialPost = {
 };
 
 // 미들웨어
-const getPostAxios = (start = null, size = 3) => {
+const getPostAxios = (page = 1, size = 3) => {
   return function (dispatch, getState, { history }) {
     let _paging = getState().post.paging;
     if (_paging.start && !_paging.next) {
@@ -51,16 +51,14 @@ const getPostAxios = (start = null, size = 3) => {
     }
     dispatch(loading(true));
     instance
-      .get(
-        "api/post",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      .get(`api/post?page=${page}&size=${size}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        { withCredentials: true }
-      )
+        withCredentials: true,
+      })
       .then((res) => {
+        
         dispatch(getPost(res.data, false));
       })
       .catch((err) => console.log("getPostAxios::: ", err.message));
@@ -70,15 +68,12 @@ const getPostAxios = (start = null, size = 3) => {
 const getOnePostAxios = (postId) => {
   return function (dispatch, getState, { history }) {
     instance
-      .get(
-        `api/post/${postId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      .get(`api/post/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        { withCredentials: true }
-      )
+        withCredentials: true,
+      })
       .then((res) => {
         dispatch(getOnePost(res.data));
         history.replace(`/post/${postId}`);
@@ -118,16 +113,12 @@ const addPostAxios = (contents = "", layout = "") => {
         .then((url) => {
           const postData = { ..._post, imageUrl: url };
           instance
-            .post(
-              "api/post",
-              postData,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
+            .post("api/post", postData, {
+              headers: {
+                Authorization: `Bearer ${token}`,
               },
-              { withCredentials: true }
-            )
+              withCredentials: true,
+            })
             .then((doc) => {
               dispatch(addPost(doc.data));
               dispatch(imageActions.setPreview(null));
@@ -173,7 +164,7 @@ const updatePostFB = (postId = null, post = {}) => {
         })
         .then((res) => {
           dispatch(updatePost(postId, updatePostData));
-          history.replace('/')
+          history.replace("/");
         })
         .catch((err) => console.log("updatePost: ", err.response));
       return;
@@ -201,8 +192,8 @@ const updatePostFB = (postId = null, post = {}) => {
                 }
               )
               .then(() => {
+                history.replace("/");
                 dispatch(updatePost(postId, { ...post, imageUrl: url }));
-                history.replace('/')
               })
               .catch((err) => console.log(" ", err.code, err.message));
           })
@@ -222,15 +213,12 @@ const deletePostAxios = (postId = null) => {
     }
 
     instance
-      .delete(
-        `api/post/${postId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      .delete(`api/post/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        { withCredentials: true }
-      )
+        withCredentials: true,
+      })
       .then(() => {
         dispatch(deletePost(postId));
         window.location.replace("/");
@@ -244,6 +232,10 @@ export default handleActions(
     [GET_POST]: (state, action) =>
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
+        draft.paging.page += 1
+        if(action.payload.post_list < 3){
+          draft.paging.next = false
+        }
         draft.is_loading = false;
       }),
     [GET_ONE_POST]: (state, action) =>

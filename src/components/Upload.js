@@ -13,6 +13,7 @@ const Upload = (props) => {
   const selectFile = (e) => {
     const reader = new FileReader();
     const file = fileInput.current.files[0];
+    console.log(reader.result)
 
     reader.readAsDataURL(file);
 
@@ -25,14 +26,6 @@ const Upload = (props) => {
   return (
     <>
       <Grid is_flex>
-        <Input
-          width="100%"
-          type="text"
-          placeholder="사진을 선택해주세요!"
-          value={fileName}
-          margin="0"
-          disabled
-        />
         <Button width="50px">
           <label htmlFor="file">파일 찾기</label>
         </Button>

@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { actionCreators as postActions } from "../redux/modules/post";
+import { actionCreators as imageActions } from "../redux/modules/image";
 
 import { Grid, Button } from "../elements";
 
@@ -14,20 +15,25 @@ import { history } from "../redux/configureStore";
 
 const PostList = (props) => {
   const dispatch = useDispatch();
-  const post_list = useSelector((state) => state.post.list);
+  const { list, is_loading, paging } = useSelector((state) => state.post);
+  console.log(list);
 
   useEffect(() => {
-    if (post_list.length < 2) {
-      dispatch(postActions.getPostAxios());
-    }
+    dispatch(postActions.getPostAxios(paging.page));
+    dispatch(imageActions.setPreview(null));
   }, []);
 
   return (
     <React.Fragment>
       <Grid padding="12px 0px">
-        <InfinityScroll>
-          {post_list.map((p) => {
-            console.log(p);
+        <InfinityScroll
+          callNext={() => {
+            dispatch(postActions.getPostAxios(paging.page));
+          }}
+          is_next={paging.next ? true : false}
+          loading={is_loading}
+        >
+          {list.map((p) => {
             return (
               <Grid bg="#ffffff" margin="8px 0px" key={p.postId}>
                 <Post {...p} />
