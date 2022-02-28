@@ -53,7 +53,7 @@ const Post = (props) => {
         </Grid>
         <Grid
           _onClick={() => {
-            history.replace(`/post/${props.postId}`);
+            history.push(`/post/${props.postId}`);
           }}
         >
           {layout === "DEFAULT" && (

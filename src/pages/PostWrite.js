@@ -17,7 +17,6 @@ const PostWrite = (props) => {
 
   let _post = is_edit ? post_list.find((p) => p.postId === parseInt(id)) : null;
 
-  console.log(_post);
   const [contents, setContents] = React.useState(_post ? _post.contents : "");
   const [layout, setLayout] = React.useState("DEFAULT");
   const layout_list = ["DEFAULT", "RIGHT", "LEFT"];
@@ -25,12 +24,10 @@ const PostWrite = (props) => {
   const layoutPost = (e) => {
     setLayout(e.target.value);
   };
-  console.log(layout);
 
   const changeContents = (e) => {
     setContents(e.target.value);
   };
-  console.log(contents);
 
   useEffect(() => {
     if (is_edit && !_post) {
@@ -50,7 +47,7 @@ const PostWrite = (props) => {
 
   const editPost = () => {
     dispatch(
-      postActions.updatePostFB(id, { contents: contents, layoutType: layout })
+      postActions.updatePostAxios(id, { contents: contents, layoutType: layout })
     );
   };
 
