@@ -20,7 +20,7 @@ const Header = (props) => {
       <Grid is_flex padding="16px">
         <Grid
           _onClick={() => {
-            history.replace("/");
+            history.push("/");
           }}
         >
           <Text margin="0px" size="24px" bold color="#9919e8">

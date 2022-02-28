@@ -29,13 +29,11 @@ const Like = (props) => {
         <Text>좋아요 {likeCnt}개</Text>
       </Grid>
       <Grid>
-        <Permit>
           {userLiked ? (
             <FavoriteIcon style={{ color: "red" }} onClick={cancelLike} />
           ) : (
             <FavoriteBorderIcon onClick={addLike} />
           )}
-        </Permit>
       </Grid>
     </>
   );

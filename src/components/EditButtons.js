@@ -28,7 +28,7 @@ const EditButtons = (props) => {
       <ButtonGroup color="secondary" aria-label="medium secondary button group">
         <Button
           onClick={() => {
-            history.replace("/");
+            history.push("/");
           }}
         >
           메인으로

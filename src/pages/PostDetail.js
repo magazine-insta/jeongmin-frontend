@@ -45,7 +45,7 @@ const PostDetail = (props) => {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  history.replace("/");
+                  history.push("/");
                 }}
               >
                 메인으로

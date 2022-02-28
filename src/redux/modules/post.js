@@ -43,7 +43,7 @@ const initialPost = {
 };
 
 // 미들웨어
-const getPostAxios = (page = 1, size = 3) => {
+const getPostAxios = (page = 0, size = 3) => {
   return function (dispatch, getState, { history }) {
     let _paging = getState().post.paging;
     if (_paging.start && !_paging.next) {
@@ -58,9 +58,9 @@ const getPostAxios = (page = 1, size = 3) => {
         withCredentials: true,
       })
       .then((res) => {
-        dispatch(getPost(res.data, false));
+        dispatch(getPost(res.data));
       })
-      .catch((err) => console.log("getPostAxios::: ", err.message));
+      .catch((err) => console.log("getPostAxios::: ", err.response));
   };
 };
 
@@ -74,11 +74,11 @@ const getOnePostAxios = (postId) => {
         withCredentials: true,
       })
       .then((res) => {
-        history.replace(`/post/${postId}`);
+        history.push(`/post/${postId}`);
         dispatch(getOnePost(res.data));
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.response);
       });
   };
 };
@@ -119,24 +119,24 @@ const addPostAxios = (contents = "", layout = "") => {
               withCredentials: true,
             })
             .then((doc) => {
-              history.replace("/");
+              history.push("/");
               dispatch(addPost(doc.data));
               dispatch(imageActions.setPreview(null));
             })
             .catch((err) => {
-              window.alert("앗! 포스트 작성에 문제가 있어요!");
-              console.log("post 작성에 실패했어요!", err.response);
+              window.alert("앗! 글쓰기에 문제가 있어요!");
+              console.log("글작성API::::: ", err.response);
             });
         })
         .catch((err) => {
           window.alert("앗! 이미지 업로드에 문제가 있어요!");
-          console.log("앗! 이미지 업로드에 문제가 있어요!", err);
+          console.log("글작성API::::: ", err.response);
         });
     });
   };
 };
 
-const updatePostFB = (postId = null, post = {}) => {
+const updatePostAxios = (postId = null, post = {}) => {
   return function (dispatch, getState, { history }) {
     if (!postId) {
       console.log("게시물 정보가 없어요!");
@@ -144,14 +144,13 @@ const updatePostFB = (postId = null, post = {}) => {
     }
 
     const _image = getState().image.preview;
-    // const _postIdx = getState().post.list.findIndex((p) => p.id === postId);
+    // const _postIdx = getState().post.list.find((p) => p.postId === postId);
     const _post = getState().post.list[0];
-    console.log(_post);
+    console.log(_post)
     const updatePostData = {
       ...post,
       imageUrl: _post.imageUrl,
     };
-    console.log(updatePostData);
 
     if (_image === _post.imageUrl) {
       instance
@@ -162,10 +161,11 @@ const updatePostFB = (postId = null, post = {}) => {
           withCredentials: true,
         })
         .then((res) => {
+          console.log(updatePost(postId, updatePostData))
           history.replace("/");
           dispatch(updatePost(postId, updatePostData));
         })
-        .catch((err) => console.log("updatePost: ", err.response));
+        .catch((err) => console.log("업데이트 게시글::::: ", err.response));
       return;
     } else {
       const _upload = storage
@@ -175,7 +175,6 @@ const updatePostFB = (postId = null, post = {}) => {
         snapshot.ref
           .getDownloadURL()
           .then((url) => {
-            console.log(url);
             return url;
           })
           .then((url) => {
@@ -190,14 +189,15 @@ const updatePostFB = (postId = null, post = {}) => {
                   withCredentials: true,
                 }
               )
-              .then(() => {
+              .then((res) => {
+                console.log(res)
                 history.replace("/");
                 dispatch(updatePost(postId, { ...post, imageUrl: url }));
               })
-              .catch((err) => console.log(" ", err.code, err.message));
+              .catch((err) => console.log(" ", err.response));
           })
           .catch((err) => {
-            console.log("앗! 이미지 업로드에 문제가 있어요!", err.message);
+            console.log("업데이트 게시글::::: ", err.response);
           });
       });
     }
@@ -219,10 +219,10 @@ const deletePostAxios = (postId = null) => {
         withCredentials: true,
       })
       .then(() => {
+        history.replace("/");
         dispatch(deletePost(postId));
-        window.location.replace("/");
       })
-      .catch((err) => console.log("deletePost::: ", err.message));
+      .catch((err) => console.log("게시글삭제::::: ", err.response));
   };
 };
 
@@ -249,9 +249,7 @@ export default handleActions(
 
     [UPDATE_POST]: (state, action) =>
       produce(state, (draft) => {
-        let idx = draft.list.findIndex((p) => p.id === action.payload.postId);
-
-        draft.list[idx] = { ...draft.list[idx], ...action.payload.post };
+        draft.list[0] = { ...action.payload.post };
       }),
 
     [LOADING]: (state, action) =>
@@ -271,7 +269,7 @@ const actionCreators = {
   getPostAxios,
   getOnePostAxios,
   addPostAxios,
-  updatePostFB,
+  updatePostAxios,
   deletePostAxios,
 };
 

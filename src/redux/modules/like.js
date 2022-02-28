@@ -56,8 +56,8 @@ const addLikeAxios = (postId) => {
         { withCredentials: true }
       )
       .then((docs) => {
-        console.log(docs);
-        // dispatch(addLike(postId));
+        // console.log(docs);
+        dispatch(addLike(postId));
       })
       .catch((err) => {
         console.log("like::: ", err.response);
@@ -78,8 +78,8 @@ const cancelLikeAxios = (postId) => {
         { withCredentials: true }
       )
       .then((docs) => {
-        console.log(docs);
-        // dispatch(cancelLike(postId));
+        // console.log(docs);
+        dispatch(cancelLike(postId));
       })
       .catch((err) => {
         console.log("like::: ", err.response);
@@ -103,7 +103,6 @@ export default handleActions(
 );
 
 const actionCreators = {
-  // getLikeAxios,
   addLikeAxios,
   cancelLikeAxios,
 };

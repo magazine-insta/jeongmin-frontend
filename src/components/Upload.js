@@ -8,7 +8,6 @@ const Upload = (props) => {
   const dispatch = useDispatch();
   const uploading = useSelector((state) => state.image.uploading);
   const fileInput = useRef();
-  const [fileName, setFileName] = useState("");
 
   const selectFile = (e) => {
     const reader = new FileReader();
@@ -19,22 +18,13 @@ const Upload = (props) => {
     reader.onloadend = () => {
       dispatch(imageActions.setPreview(reader.result));
     };
-    setFileName(e.target.value.split("\\")[2]);
   };
 
   return (
     <>
       <Grid is_flex>
-        <Input
-          width="50%"
-          type="text"
-          placeholder="사진을 선택해주세요!"
-          value={fileName}
-          margin="0"
-          disabled
-        />
-        <Button width="50px">
-          <label htmlFor="file">파일 찾기</label>
+        <Button width="100px">
+          <label htmlFor="file">이미지 올리기</label>
         </Button>
         <input
           id="file"
