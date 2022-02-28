@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 
 import styled from "styled-components";
@@ -53,7 +53,6 @@ const Post = (props) => {
         </Grid>
         <Grid
           _onClick={() => {
-            console.log(props.postId);
             history.replace(`/post/${props.postId}`);
           }}
         >
